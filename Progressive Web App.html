@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularios Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+        }
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            border: 1px solid #e2e8f0;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-secondary {
+            background: #f8fafc;
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { background: #f1f5f9; }
+        .input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .grid-cols-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen">
+        <div class="container mx-auto p-6 max-w-6xl">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">📋 Sistema de Formularios</h1>
+                <p class="text-gray-600">Crea formularios y analiza el rendimiento de tus usuarios</p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex gap-2 mb-6 overflow-x-auto">
+                <button onclick="showTab('forms')" id="tab-forms" class="btn-primary">Formularios</button>
+                <button onclick="showTab('create')" id="tab-create" class="btn-secondary">Crear Nuevo</button>
+                <button onclick="showTab('analytics')" id="tab-analytics" class="btn-secondary">📊 Analytics</button>
+                <button onclick="showTab('preview')" id="tab-preview" class="btn-secondary">👁️ Vista Previa</button>
+            </div>
+
+            <!-- Content Areas -->
+            
+            <!-- Lista de Formularios -->
+            <div id="content-forms" class="content-section">
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" id="forms-list">
+                    <!-- Los formularios se cargan aquí -->
+                </div>
+            </div>
+
+            <!-- Crear Formulario -->
+            <div id="content-create" class="content-section hidden">
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold mb-4">🆕 Crear Nuevo Formulario</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Nombre del Formulario</label>
+                        <input type="text" id="form-name" class="input" placeholder="Ejemplo: Registro de Cliente">
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="block text-sm font-medium">Campos</label>
+                            <button onclick="addField()" class="btn-primary">➕ Agregar Campo</button>
+                        </div>
+                        <div id="fields-container">
+                            <!-- Los campos se agregan aquí -->
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="saveForm()" class="btn-primary">💾 Guardar Formulario</button>
+                        <button onclick="clearForm()" class="btn-secondary">🗑️ Limpiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div id="content-analytics" class="content-section hidden">
+                <div class="grid gap-6">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="card p-4 text-center">
+                            <div class="text-2xl mb-2">📝</div>
+                            <div class="text-2xl font-bold" id="total-submissions">0</div>
+                            <div class="text-sm text-gray-600">Total Envíos</div>
+                        </div>
+                        <div class="card p-4 text-center">
+                            <div class="text-2xl mb-2">✅</div>
+                            <div class="text-2xl font-bold" id="completion-rate">0%</div>
+                            <div class="text-sm text-gray-600">Tasa Completación</div>
+                        </div>
+                        <div class="card p-4 text-center">
+                            <div class="text-2xl mb-2">⏱️</div>
+                            <div class="text-2xl font-bold" id="avg-time">0s</div>
+                            <div class="text-sm text-gray-600">Tiempo Promedio</div>
+                        </div>
+                        <div class="card p-4 text-center">
+                            <div class="text-2xl mb-2">👥</div>
+                            <div class="text-2xl font-bold" id="unique-users">0</div>
+                            <div class="text-sm text-gray-600">Usuarios Únicos</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Submissions -->
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold mb-4">📋 Envíos Recientes</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b">
+                                        <th class="text-left p-2">Usuario</th>
+                                        <th class="text-left p-2">Formulario</th>
+                                        <th class="text-left p-2">Fecha</th>
+                                        <th class="text-left p-2">Tiempo</th>
+                                        <th class="text-left p-2">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submissions-table">
+                                    <!-- Las submissions se cargan aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Previa -->
+            <div id="content-preview" class="content-section hidden">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Seleccionar Formulario</label>
+                    <select id="preview-form-select" class="input" onchange="loadPreview()">
+                        <option value="">Selecciona un formulario...</option>
+                    </select>
+                </div>
+                <div id="preview-container">
+                    <!-- El formulario de vista previa se carga aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let forms = JSON.parse(localStorage.getItem('forms') || '[]');
+        let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+        let fieldCounter = 0;
+
+        // Inicializar app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadForms();
+            updateAnalytics();
+            updatePreviewSelect();
+            showTab('forms');
+        });
+
+        // Navegación entre tabs
+        function showTab(tabName) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Resetear estilos de tabs
+            document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                tab.className = 'btn-secondary';
+            });
+            
+            // Mostrar sección activa
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).className = 'btn-primary';
+        }
+
+        // Gestión de formularios
+        function addField() {
+            fieldCounter++;
+            const container = document.getElementById('fields-container');
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'card p-4 mb-4';
+            fieldDiv.innerHTML = `
+                <div class="grid grid-cols-12 gap-4 items-end">
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block text-xs font-medium mb-1">Etiqueta</label>
+                        <input type="text" class="input text-sm" placeholder="Nombre del campo">
+                    </div>
+                    <div class="col-span-6 md:col-span-3">
+                        <label class="block text-xs font-medium mb-1">Tipo</label>
+                        <select class="input text-sm">
+                            <option value="text">Texto</option>
+                            <option value="email">Email</option>
+                            <option value="tel">Teléfono</option>
+                            <option value="number">Número</option>
+                            <option value="textarea">Área de Texto</option>
+                        </select>
+                    </div>
+                    <div class="col-span-4 md:col-span-3">
+                        <label class="flex items-center gap-2 text-xs">
+                            <input type="checkbox"> Requerido
+                        </label>
+                    </div>
+                    <div class="col-span-2">
+                        <button onclick="this.closest('.card').remove()" class="btn-secondary text-red-600">🗑️</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(fieldDiv);
+        }
+
+        function saveForm() {
+            const name = document.getElementById('form-name').value.trim();
+            if (!name) {
+                alert('Por favor ingresa un nombre para el formulario');
+                return;
+            }
+
+            const fieldElements = document.querySelectorAll('#fields-container .card');
+            if (fieldElements.length === 0) {
+                alert('Agrega al menos un campo al formulario');
+                return;
+            }
+
+            const fields = [];
+            fieldElements.forEach((fieldEl, index) => {
+                const label = fieldEl.querySelector('input[type="text"]').value.trim();
+                const type = fieldEl.querySelector('select').value;
+                const required = fieldEl.querySelector('input[type="checkbox"]').checked;
+                
+                if (label) {
+                    fields.push({
+                        id: index + 1,
+                        label: label,
+                        type: type,
+                        required: required
+                    });
+                }
+            });
+
+            if (fields.length === 0) {
+                alert('Ingresa al menos un campo válido');
+                return;
+            }
+
+            const form = {
+                id: Date.now(),
+                name: name,
+                fields: fields,
+                created: new Date().toLocaleDateString(),
+                status: 'active'
+            };
+
+            forms.push(form);
+            localStorage.setItem('forms', JSON.stringify(forms));
+            
+            clearForm();
+            loadForms();
+            updatePreviewSelect();
+            alert('✅ Formulario guardado correctamente');
+        }
+
+        function clearForm() {
+            document.getElementById('form-name').value = '';
+            document.getElementById('fields-container').innerHTML = '';
+            fieldCounter = 0;
+        }
+
+        function loadForms() {
+            const container = document.getElementById('forms-list');
+            container.innerHTML = '';
+            
+            if (forms.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-lg font-medium mb-2">No hay formularios</h3>
+                        <p class="text-gray-600 mb-4">Crea tu primer formulario para empezar</p>
+                        <button onclick="showTab('create')" class="btn-primary">🆕 Crear Formulario</button>
+                    </div>
+                `;
+                return;
+            }
+
+            forms.forEach(form => {
+                const formSubmissions = submissions.filter(s => s.formId === form.id);
+                const completedSubmissions = formSubmissions.filter(s => s.completed);
+                const completionRate = formSubmissions.length > 0 
+                    ? Math.round((completedSubmissions.length / formSubmissions.length) * 100) 
+                    : 0;
+
+                const formCard = document.createElement('div');
+                formCard.className = 'card p-6';
+                formCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-bold">${form.name}</h3>
+                        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Activo</span>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm text-gray-600 mb-4">
+                        <p>📋 Campos: ${form.fields.length}</p>
+                        <p>📅 Creado: ${form.created}</p>
+                        <p>📊 Envíos: ${formSubmissions.length}</p>
+                        <p>✅ Completación: ${completionRate}%</p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="previewForm(${form.id})" class="btn-secondary">👁️ Ver</button>
+                        <button onclick="deleteForm(${form.id})" class="btn-secondary text-red-600">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(formCard);
+            });
+        }
+
+        function deleteForm(formId) {
+            if (confirm('¿Estás seguro de eliminar este formulario?')) {
+                forms = forms.filter(f => f.id !== formId);
+                localStorage.setItem('forms', JSON.stringify(forms));
+                loadForms();
+                updatePreviewSelect();
+            }
+        }
+
+        function previewForm(formId) {
+            document.getElementById('preview-form-select').value = formId;
+            loadPreview();
+            showTab('preview');
+        }
+
+        // Vista previa
+        function updatePreviewSelect() {
+            const select = document.getElementById('preview-form-select');
+            select.innerHTML = '<option value="">Selecciona un formulario...</option>';
+            
+            forms.forEach(form => {
+                const option = document.createElement('option');
+                option.value = form.id;
+                option.textContent = form.name;
+                select.appendChild(option);
+            });
+        }
+
+        function loadPreview() {
+            const formId = parseInt(document.getElementById('preview-form-select').value);
+            const container = document.getElementById('preview-container');
+            
+            if (!formId) {
+                container.innerHTML = `
+                    <div class="card p-12 text-center">
+                        <div class="text-4xl mb-4">👁️</div>
+                        <p class="text-gray-500">Selecciona un formulario para ver la vista previa</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const form = forms.find(f => f.id === formId);
+            if (!form) return;
+
+            const startTime = Date.now();
+            let formData = {};
+
+            container.innerHTML = `
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-6">${form.name}</h3>
+                    <div class="space-y-4" id="form-fields">
+                        ${form.fields.map(field => `
+                            <div>
+                                <label class="block text-sm font-medium mb-2">
+                                    ${field.label}
+                                    ${field.required ? '<span class="text-red-500">*</span>' : ''}
+                                </label>
+                                ${field.type === 'textarea' 
+                                    ? `<textarea class="input" rows="4" data-field-id="${field.id}"></textarea>`
+                                    : `<input type="${field.type}" class="input" data-field-id="${field.id}">`
+                                }
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button onclick="submitPreviewForm(${form.id}, ${startTime})" class="btn-primary w-full mt-6">
+                        📤 Enviar Formulario
+                    </button>
+                </div>
+            `;
+
+            // Agregar listeners para tracking
+            container.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    formData[e.target.dataset.fieldId] = e.target.value;
+                });
+            });
+        }
+
+        function submitPreviewForm(formId, startTime) {
+            const form = forms.find(f => f.id === formId);
+            const formData = {};
+            let isValid = true;
+
+            // Recopilar datos y validar
+            document.querySelectorAll('#preview-container input, #preview-container textarea').forEach(input => {
+                const fieldId = parseInt(input.dataset.fieldId);
+                const field = form.fields.find(f => f.id === fieldId);
+                
+                formData[fieldId] = input.value;
+                
+                if (field.required && !input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#ef4444';
+                } else {
+                    input.style.borderColor = '#d1d5db';
+                }
+            });
+
+            if (!isValid) {
+                alert('⚠️ Por favor completa todos los campos requeridos');
+                return;
+            }
+
+            const timeSpent = Math.round((Date.now() - startTime) / 1000);
+            const userId = 'user_' + Date.now().toString().slice(-6);
+            
+            const submission = {
+                id: Date.now(),
+                formId: formId,
+                userId: userId,
+                timestamp: new Date().toISOString(),
+                timeSpent: timeSpent,
+                completed: true,
+                data: formData
+            };
+
+            submissions.push(submission);
+            localStorage.setItem('submissions', JSON.stringify(submissions));
+            
+            updateAnalytics();
+            loadForms();
+            
+            alert('✅ Formulario enviado correctamente!\n⏱️ Tiempo: ' + timeSpent + ' segundos');
+            
+            // Limpiar formulario
+            document.querySelectorAll('#preview-container input, #preview-container textarea').forEach(input => {
+                input.value = '';
+            });
+        }
+
+        // Analytics
+        function updateAnalytics() {
+            const totalSubmissions = submissions.length;
+            const completedSubmissions = submissions.filter(s => s.completed).length;
+            const completionRate = totalSubmissions > 0 ? Math.round((completedSubmissions / totalSubmissions) * 100) : 0;
+            const avgTime = totalSubmissions > 0 ? Math.round(submissions.reduce((acc, s) => acc + s.timeSpent, 0) / totalSubmissions) : 0;
+            const uniqueUsers = new Set(submissions.map(s => s.userId)).size;
+
+            document.getElementById('total-submissions').textContent = totalSubmissions;
+            document.getElementById('completion-rate').textContent = completionRate + '%';
+            document.getElementById('avg-time').textContent = avgTime + 's';
+            document.getElementById('unique-users').textContent = uniqueUsers;
+
+            // Actualizar tabla de submissions
+            const tbody = document.getElementById('submissions-table');
+            tbody.innerHTML = '';
+            
+            submissions.slice(-10).reverse().forEach(submission => {
+                const form = forms.find(f => f.id === submission.formId);
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-2">${submission.userId}</td>
+                    <td class="p-2">${form ? form.name : 'Formulario eliminado'}</td>
+                    <td class="p-2">${new Date(submission.timestamp).toLocaleString()}</td>
+                    <td class="p-2">${submission.timeSpent}s</td>
+                    <td class="p-2">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            submission.completed 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${submission.completed ? '✅ Completado' : '⏳ Incompleto'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Función para exportar datos
+        function exportData() {
+            const data = {
+                forms: forms,
+                submissions: submissions,
+                exported: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formularios-datos-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Agregar botón de exportar en analytics
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const analyticsSection = document.getElementById('content-analytics');
+                if (analyticsSection) {
+                    const exportBtn = document.createElement('div');
+                    exportBtn.className = 'text-center mt-6';
+                    exportBtn.innerHTML = `
+                        <button onclick="exportData()" class="btn-secondary">
+                            📊 Exportar Datos
+                        </button>
+                    `;
+                    analyticsSection.appendChild(exportBtn);
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
