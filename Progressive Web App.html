@@ -92,7 +92,6 @@
 </head>
 <body>
 
-<!-- Login Section -->
 <div id="auth-section" class="min-h-screen flex items-center justify-center bg-[#002338] text-white p-6">
     <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8 text-[#002338]">
         <h2 class="text-2xl font-semibold mb-6 text-center">Iniciar Sesión</h2>
@@ -113,7 +112,6 @@
     </div>
 </div>
 
-<!-- Register Modal -->
 <div id="register-modal" class="modal">
     <div class="modal-content">
         <h3 class="text-xl font-semibold mb-4">Crear Nueva Cuenta</h3>
@@ -140,10 +138,8 @@
     </div>
 </div>
 
-<!-- Main App -->
-<div id="app" class="min-h-screen">
+<div id="app" class="min-h-screen hidden">
     <div class="container mx-auto p-6 max-w-6xl">
-        <!-- Header -->
         <div class="mb-8 flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-semibold text-[#002338] mb-2">📋 Sistema de Formularios</h1>
@@ -155,7 +151,9 @@
             </div>
         </div>
 
-        <!-- Navigation -->
+        <div id="notification-area" class="mb-6 hidden">
+            </div>
+
         <div class="flex gap-2 mb-6 overflow-x-auto">
             <button onclick="showTab('forms')" id="tab-forms" class="btn-primary">Formularios</button>
             <button onclick="showTab('create')" id="tab-create" class="btn-secondary">Crear Nuevo</button>
@@ -164,16 +162,11 @@
             <button onclick="showTab('preview')" id="tab-preview" class="btn-secondary">👁️ Vista Previa</button>
         </div>
 
-        <!-- Content Areas -->
-        
-        <!-- Lista de Formularios -->
         <div id="content-forms" class="content-section">
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" id="forms-list">
-                <!-- Los formularios se cargan aquí -->
-            </div>
+                </div>
         </div>
 
-        <!-- Crear Formulario -->
         <div id="content-create" class="content-section hidden">
             <div class="card p-6 border border-[#002338]">
                 <h2 class="text-2xl font-semibold text-[#002338] mb-4">🆕 Crear Nuevo Formulario</h2>
@@ -189,8 +182,7 @@
                         <button onclick="addField()" class="btn-primary">➕ Agregar Campo</button>
                     </div>
                     <div id="fields-container">
-                        <!-- Los campos se agregan aquí -->
-                    </div>
+                        </div>
                 </div>
 
                 <div class="flex gap-3">
@@ -200,10 +192,8 @@
             </div>
         </div>
 
-        <!-- Analytics -->
         <div id="content-analytics" class="content-section hidden">
             <div class="grid gap-6">
-                <!-- Stats Cards -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="card p-4 text-center border border-[#002338]">
                         <div class="text-2xl mb-2">📝</div>
@@ -227,7 +217,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Submissions -->
                 <div class="card p-6 border border-[#002338]">
                     <h3 class="text-xl font-semibold text-[#002338] mb-4">📋 Envíos Recientes</h3>
                     <div class="overflow-x-auto">
@@ -242,18 +231,15 @@
                                 </tr>
                             </thead>
                             <tbody id="submissions-table">
-                                <!-- Las submissions se cargan aquí -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Gestión de Usuarios (Solo Admin) -->
         <div id="content-users" class="content-section hidden">
             <div class="grid gap-6">
-                <!-- User Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="card p-4 text-center border border-[#002338]">
                         <div class="text-2xl mb-2">👥</div>
@@ -277,7 +263,6 @@
                     </div>
                 </div>
 
-                <!-- Users Table -->
                 <div class="card p-6 border border-[#002338]">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-semibold text-[#002338]">👥 Gestión de Usuarios</h3>
@@ -298,23 +283,19 @@
                                 </tr>
                             </thead>
                             <tbody id="users-table">
-                                <!-- Los usuarios se cargan aquí -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- User Performance Chart -->
                 <div class="card p-6 border border-[#002338]">
                     <h3 class="text-xl font-semibold text-[#002338] mb-4">📊 Rendimiento de Usuarios</h3>
                     <div id="user-performance-chart">
-                        <!-- Chart goes here -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
 
-        <!-- Vista Previa -->
         <div id="content-preview" class="content-section hidden">
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-[#002338] mb-2">Seleccionar Formulario</label>
@@ -323,13 +304,11 @@
                 </select>
             </div>
             <div id="preview-container">
-                <!-- El formulario de vista previa se carga aquí -->
-            </div>
+                </div>
         </div>
     </div>
 </div>
 
-<!-- Create User Modal -->
 <div id="create-user-modal" class="modal">
     <div class="modal-content">
         <h3 class="text-xl font-semibold mb-4">Crear Nuevo Usuario</h3>
@@ -438,6 +417,7 @@ function login() {
     if (user.role === 'admin') {
         loadUsers();
     }
+    displayNotifications(); // Call notification function on login
 }
 
 function logout() {
@@ -447,6 +427,8 @@ function logout() {
     document.getElementById('app').style.display = 'none';
     document.getElementById('login-username').value = '';
     document.getElementById('login-password').value = '';
+    document.getElementById('tab-users').classList.add('hidden'); // Hide admin tab on logout
+    document.getElementById('notification-area').classList.add('hidden'); // Hide notifications on logout
 }
 
 function showRegisterModal() {
@@ -604,7 +586,7 @@ function loadUsers() {
     const userSubmissions = {};
     
     submissions.forEach(sub => {
-        const user = users.find(u => u.username === sub.userId?.replace('user_', ''));
+        const user = users.find(u => u.username === sub.userId); // Correctly match username
         if (user) {
             userSubmissions[user.id] = (userSubmissions[user.id] || 0) + 1;
         }
@@ -620,7 +602,7 @@ function loadUsers() {
 
     users.forEach(user => {
         const userSubs = userSubmissions[user.id] || 0;
-        const completedSubs = submissions.filter(s => s.userId?.includes(user.username) && s.completed).length;
+        const completedSubs = submissions.filter(s => s.userId === user.username && s.completed).length; // Filter by user.username
         const performance = userSubs > 10 ? 'Alto' : userSubs > 5 ? 'Medio' : 'Bajo';
         const performanceClass = userSubs > 10 ? 'user-performance-high' : userSubs > 5 ? 'user-performance-medium' : 'user-performance-low';
 
@@ -652,12 +634,42 @@ function loadUsers() {
                         ${user.active ? 'Desactivar' : 'Activar'}
                     </button>
                     ${user.id !== currentUser.id ? `<button onclick="deleteUser(${user.id})" class="btn-danger text-xs">Eliminar</button>` : ''}
+                    <button onclick="viewUserReport(${user.id})" class="btn-secondary text-xs">📄 Reporte</button>
                 </div>
             </td>
         `;
         tbody.appendChild(row);
     });
 }
+
+function viewUserReport(userId) {
+    if (currentUser.role !== 'admin') {
+        alert('Solo los administradores pueden ver reportes de usuario.');
+        return;
+    }
+    const user = users.find(u => u.id === userId);
+    if (!user) {
+        alert('Usuario no encontrado.');
+        return;
+    }
+    const userSubs = submissions.filter(s => s.userId === user.username);
+    const totalSubmissions = userSubs.length;
+    const avgTime = totalSubmissions > 0 ? Math.round(userSubs.reduce((acc, s) => acc + s.timeSpent, 0) / totalSubmissions) : 0;
+    const lastSubmission = userSubs.length ? new Date(userSubs[userSubs.length - 1].timestamp).toLocaleString() : 'N/A';
+
+    const report = `
+        📄 Reporte de Usuario: ${user.fullName} (${user.username})\n
+        ------------------------------------------
+        Total de Formularios Enviados: ${totalSubmissions}
+        Tiempo Promedio por Formulario: ${avgTime}s
+        Último Envío: ${lastSubmission}
+        Rol: ${user.role === 'admin' ? 'Administrador' : 'Usuario'}
+        Estado: ${user.active ? 'Activo' : 'Inactivo'}
+        Email: ${user.email}
+    `;
+    alert(report);
+}
+
 
 // Tab Navigation
 function showTab(tabName) {
@@ -764,7 +776,7 @@ function saveForm() {
         id: Date.now(),
         name: name,
         fields: fields,
-        created: new Date().toLocaleDateString(),
+        created: new Date().toISOString(), // Store as ISO string for easier comparison
         createdBy: currentUser.username,
         status: 'active'
     };
@@ -776,6 +788,7 @@ function saveForm() {
     loadForms();
     updatePreviewSelect();
     alert('✅ Formulario guardado correctamente');
+    displayNotifications(); // Update notifications after new form is created
 }
 
 function clearForm() {
@@ -817,7 +830,7 @@ function loadForms() {
             
             <div class="space-y-2 text-sm text-[#77c25c] mb-4">
                 <p>📋 Campos: ${form.fields.length}</p>
-                <p>📅 Creado: ${form.created}</p>
+                <p>📅 Creado: ${new Date(form.created).toLocaleDateString()}</p>
                 <p>👤 Por: ${form.createdBy || 'Sistema'}</p>
                 <p>📊 Envíos: ${formSubmissions.length}</p>
                 <p>✅ Completación: ${completionRate}%</p>
@@ -825,7 +838,7 @@ function loadForms() {
 
             <div class="flex gap-2">
                 <button onclick="previewForm(${form.id})" class="btn-secondary">👁️ Ver</button>
-                ${currentUser.role === 'admin' || form.createdBy === currentUser.username ? 
+                ${currentUser && (currentUser.role === 'admin' || form.createdBy === currentUser.username) ? 
                     `<button onclick="deleteForm(${form.id})" class="btn-secondary text-red-600">🗑️</button>` : ''}
             </div>
         `;
@@ -845,6 +858,7 @@ function deleteForm(formId) {
         localStorage.setItem('forms', JSON.stringify(forms));
         loadForms();
         updatePreviewSelect();
+        displayNotifications(); // Update notifications after form is deleted
     }
 }
 
@@ -1014,6 +1028,38 @@ function updateAnalytics() {
     });
 }
 
+// Notifications
+function displayNotifications() {
+    const notificationArea = document.getElementById('notification-area');
+    notificationArea.innerHTML = ''; // Clear previous notifications
+    notificationArea.classList.add('hidden'); // Hide by default
+
+    if (currentUser) {
+        // Example: Notify about new forms created in the last 7 days
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const newForms = forms.filter(f => new Date(f.created) > sevenDaysAgo);
+
+        if (newForms.length > 0) {
+            notificationArea.innerHTML = `
+                <div class="p-4 rounded-lg bg-green-100 text-green-800">
+                    📢 Hay ${newForms.length} formulario(s) nuevo(s) creado(s) esta semana. ¡Échales un vistazo!
+                </div>
+            `;
+            notificationArea.classList.remove('hidden');
+        } else {
+            // If no new forms, maybe a general positive message
+            notificationArea.innerHTML = `
+                <div class="p-4 rounded-lg bg-blue-100 text-blue-800">
+                    👍 ¡Todo al día! No hay formularios nuevos esta semana.
+                </div>
+            `;
+            notificationArea.classList.remove('hidden');
+        }
+
+        // Add more notification logic here if needed (e.g., low performance, high submissions)
+    }
+}
+
 // Función para exportar datos
 function exportData() {
     if (currentUser.role !== 'admin') {
@@ -1059,8 +1105,12 @@ document.addEventListener('DOMContentLoaded', function() {
             updateAnalytics();
             updatePreviewSelect();
             showTab('forms');
+            displayNotifications(); // Display notifications on page load if logged in
         } else {
-            logout();
+            logout(); // Log out if user no longer exists or is inactive
+            alert("Debe iniciar sesión para acceder al sistema.");
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('auth-section').style.display = 'flex';
         }
     } else {
         document.getElementById('auth-section').style.display = 'flex';
@@ -1068,17 +1118,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add export button to analytics section
-    setTimeout(() => {
-        const analyticsSection = document.getElementById('content-analytics');
-        if (analyticsSection && currentUser && currentUser.role === 'admin') {
-            const exportBtn = document.createElement('div');
-            exportBtn.className = 'text-center mt-6';
-            exportBtn.innerHTML = `
-                <button onclick="exportData()" class="btn-secondary">
-                    📊 Exportar Datos
-                </button>
-            `;
-            analyticsSection.appendChild(exportBtn);
-        }
-    }, 100);
+    const analyticsSection = document.getElementById('content-analytics');
+    if (analyticsSection && currentUser && currentUser.role === 'admin') {
+        const exportBtn = document.createElement('div');
+        exportBtn.className = 'text-center mt-6';
+        exportBtn.innerHTML = `
+            <button onclick="exportData()" class="btn-secondary">
+                📊 Exportar Datos
+            </button>
+        `;
+        analyticsSection.appendChild(exportBtn);
+    }
 });
+</script>
+</body>
+</html>
